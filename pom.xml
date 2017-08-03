@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2017 Jeeva Kandasamy (jkandasa@gmail.com)
+    and other contributors as indicated by the @author tags.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.mycontroller</groupId>
+    <artifactId>mycontroller-parent</artifactId>
+    <version>21</version>
+  </parent>
+
+  <groupId>org.mycontroller</groupId>
+  <artifactId>serial2mqtt</artifactId>
+  <version>1.0.0.Final-SNAPSHOT</version>
+  <url>https://github.com/mycontroller-org</url>
+  <inceptionYear>2017</inceptionYear>
+
+  <scm>
+    <url>https://github.com/mycontroller-org/serial2mqtt</url>
+    <connection>scm:git:https://github.com/mycontroller-org/serial2mqtt</connection>
+    <developerConnection>scm:git:git@github.com:mycontroller-org/serial2mqtt.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <properties>
+    <serial2mqtt.dist.finalName>${project.artifactId}-${project.version}</serial2mqtt.dist.finalName>
+    <serial2mqtt.dist.jar.finalName>${serial2mqtt.dist.finalName}-single</serial2mqtt.dist.jar.finalName>
+  </properties>
+
+  <dependencies>
+
+    <!-- Internal dependency -->
+    <dependency>
+      <groupId>org.mycontroller.standalone</groupId>
+      <artifactId>mycontroller-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>*</artifactId>
+          <groupId>*</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- serial gateway drivers -->
+    <dependency>
+      <groupId>com.fazecast</groupId>
+      <artifactId>jSerialComm</artifactId>
+    </dependency>
+
+    <!-- Logger -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+
+    <!-- commons-io version -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
+    <!-- Apache - Commons Lang -->
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+
+    <!-- MQTT client -->
+    <dependency>
+      <groupId>org.eclipse.paho</groupId>
+      <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+    </dependency>
+
+    <!-- Project lombok builder annotation -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.mycila</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <configuration>
+            <excludes combine.children="append">
+              <!-- Ignore lombok config files -->
+              <exclude>**/lombok.config</exclude>
+              <!-- Ignore yaml files -->
+              <exclude>**/package/conf/*.yaml</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <configuration>
+          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <finalName>${serial2mqtt.dist.jar.finalName}</finalName>
+              <transformers>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>org.mycontroller.serial2mqtt.StartService</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>attached</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <finalName>${serial2mqtt.dist.finalName}</finalName>
+          <descriptor>src/main/assembly/binary-deployment.xml</descriptor>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
