@@ -23,12 +23,12 @@
   <parent>
     <groupId>org.mycontroller</groupId>
     <artifactId>mycontroller-parent</artifactId>
-    <version>21</version>
+    <version>23</version>
   </parent>
 
   <groupId>org.mycontroller</groupId>
   <artifactId>serial2mqtt</artifactId>
-  <version>1.0.0.Final-SNAPSHOT</version>
+  <version>1.0.0.Final</version>
   <url>https://github.com/mycontroller-org</url>
   <inceptionYear>2017</inceptionYear>
 
