@@ -1,1 +1,104 @@
-# mc-serial-to-mqtt
+= serial2mqtt
+---
+
+==== link:http://www.mycontroller.org[Project website]
+==== link:http://forum.mycontroller.org[Forum]
+
+*serial2mqtt* is kind of adapter. This adapter receives Serial port data and sends to MQTT, vice versa
+
+=== System Requirement
+
+  * Disk        : ~15 MB
+  * Memory(RAM) : 4 MB
+  * Java        : 1.8 or later
+
+=== Supported Platforms (tested)
+
+- Linux
+- Windows
+- Raspberry PI
+
+== Installation
+==== link:https://github.com/mycontroller-org/serial2mqtt/releases[Download]
+
+==== Configuration
+
+Extract downloaded bundle where exactly do you want to run. Configuration files located in `serial2mqtt/conf`
+
+File: `serial2mqtt.properties`
+
+*Message queue size*
+
+----
+serial2mqtt.message.queue.size=1000 #<1>
+----
+
+<1> Internal message queue size. Messages will be processed immediately. However, if the serial port or MQTT broker goes down in that time messages will be stored in the message queue.
+
+
+*Network type*
+
+----
+serial2mqtt.network.type=MY_SENSORS #<1>
+----
+
+<1> For now, this adapter supports only for link:https://www.mysensors.org/[MySensors]
+
+*Serial port settings*
+
+----
+serial.driver=AUTO #<1>
+serial.port=/dev/ttyUSB0 #<2>
+serial.baud.rate=115200 #<3>
+serial.connection.retry=60 #<4>
+----
+
+<1> This adapter uses a different type of internal driver to communicate with the serial port. Always goes with `AUTO`, if you do not have any specific requirement. Supported driver options: `AUTO`, `JSERIALCOMM`
+<2> Serial port name/id
+<3> Bud rate of the serial port
+<4> When there is a connection failed on the serial port, after this delay will do retry to connect again. values in seconds
+
+*MQTT client settings*
+
+----
+mqtt.qos=0 #<1>
+mqtt.broker=tcp://localhost:1883 #<2>
+mqtt.client.id=serial2mqtt-adapter #<3>
+mqtt.topic.publish=mygateway-out #<4>
+mqtt.topic.subscribe=mygateway-in #<5>
+mqtt.username= #<6>
+mqtt.password= #<7>
+mqtt.connection.retry=60 #<8>
+----
+
+<1> QoS of this MQTT client
+<2> broker host URL in the form of tcp://<ip>:<port>
+<3> Client id, can be named without space
+<4> where to publish serial port data on MQTT topic
+<5> subscribe topic, do not include `/#` on the end. Received data will be published on Serial port
+<6> Username of the MQTT broker, if `Anonymous` access disabled on MQTT broker
+<7> Password of the MQTT broker
+<8> When there is a failed on connection, retry after this seconds.
+
+*Logger configuration*
+
+Configuration File Name: `logback.xml`
+
+Default log file location: `logs/mycontroller.log`
+
+====== Start/Stop Server
+Executable scripts are located in `serial2mqtt/bin/`
+
+* Linux
+    - Start : `./start.sh`
+    - Stop  : `./stop.sh`
+
+* Windows
+    - Start : Double click on `start.bat`
+    - Stop  : `Ctrl+C`
+
+* Other Platforms
+
+```
+java -Xms4m -Xmx4m -Dlogback.configurationFile=../conf/logback.xml -Dserial2mqtt.conf.file=../conf/serial2mqtt.properties -cp "../lib/*" org.mycontroller.serial2mqtt.StartService
+```
