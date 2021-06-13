@@ -1,6 +1,8 @@
 = serial2mqtt
 ---
 
+== There is no maintainer for this repository. Please visit the alternate https://github.com/mycontroller-org/2mqtt
+
 ==== link:http://www.mycontroller.org[Project website]
 ==== link:http://forum.mycontroller.org[Forum]
 
